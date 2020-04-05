@@ -1,11 +1,12 @@
 # WiFiRotorCtl
 Simple ESP12e driven rotor controller
 
-Had old rotator, but no control box...
-Had ESP12e and junkbox...
+Had old rotator, but no control box ....
+Had ESP12e and junkbox ....
 
 
 WiFiRot can be accessed via telnet (port 4533) or via serial connection (same as used for ESP12e programming)
+This rotor controller is last tested with cqrlog 2.4.0(115)
 
 On demand WiFi setup can be accessed at start when ESP's internal led is blinking by pressing Program button.
 Setup uses WiFimanager that starts WiFi access point called ROTCTL.
@@ -33,14 +34,14 @@ Or you can control rotator via serial interface with USB adapter (same as used f
 			MCCW [value]    set counter clockwise (max) ADC reading of rotator poti (0 .. 1023)
 					from [value] or current rotator position
 
-				NOTE! these values corresponds rotator turn of 360 degrees
+				**NOTE!** these values corresponds rotator turn of 360 degrees
 
 			LCW		set clockwise turn limit (before max reading MCW) if needed.
 					Set to current rotator position.(as ADC reading of rotator poti 0 .. 1023)
 			LCCW		set counter clockwise turn limit (before max reading MCCW) if needed.
 					Set to current rotator position.(as ADC reading of rotator poti 0 .. 1023)
 			
-				NOTE! 	If there is something that prevents rotator to turn full 360 degrees
+				**NOTE!** 	If there is something that prevents rotator to turn full 360 degrees
 					these values should be used. Otherwise they are set same as max values by program.
 
 			SOUTH		Set true south (180deg) to current rotator position.
@@ -52,7 +53,7 @@ Or you can control rotator via serial interface with USB adapter (same as used f
 
 When you have succesfully connected via telnet or serial line the first thing to do is run rotator to clockwise maximum
 position with button (or by command).
-*NOTE* that rotator usually turns a bit more than 360 degrees so you can set your clockwise maximum a little bit less
+**NOTE** that rotator usually turns a bit more than 360 degrees so you can set your clockwise maximum a little bit less
 than the physical limit of rotator.
 At that point set trace on with "C TRACE 1" to see ADC values read from rotator poti.
 Adjust trimmer so that Poti reading is less than 1023. Around 970 or so.
@@ -72,9 +73,8 @@ After that you should be able to command your rotator with P, \set_pos command.
 Values are saved to EEprom, but it is wise to write down MCW and MCCW just in case you have to set them again
 (you can give them as values after MCW and MCCW, no need to turn rotator if mechanics are not changed).
 
-This rotor controller is tested with cqrlog 2.4.0(115)
-
-Supported rotctld commans are (following text is copied from man pages of HamLib/rotctld):
+[id]: https://github.com/Hamlib/Hamlib
+Supported rotctld commans are (following text is copied from man pages of  [HamLib][id]/rotctld):
 
     COMMANDS
        Commands can be sent over the TCP socket either as a single char, or as
