@@ -76,7 +76,7 @@ This rotor controller is tested with cqrlog 2.4.0(115)
 
 Supported rotctld commans are (following text is copied from man pages of HamLib/rotctld):
 
-COMMANDS
+    COMMANDS
        Commands can be sent over the TCP socket either as a single char, or as
        a long command name plus the value(s) space separated on one '\n'  ter‐
        minated line. See PROTOCOL.
