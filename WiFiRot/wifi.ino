@@ -1,16 +1,14 @@
 //-------------------------------------------------------
-
 void wifisetup(){
-/*
    Serial.println("Entering WiFi setup");  
    digitalWrite(OnBoardLed, LedOn);
    delay(1);
    WiFiManager wifiManager;
       
-   //wifiManager.resetSettings();
-   //Serial.println("Settings reset done");
-   wifiManager.setTimeout(180);  
-   Serial.println("timeout set 180s");  
+   wifiManager.resetSettings();
+   Serial.println("Settings reset done");
+   wifiManager.setTimeout(120);  
+   Serial.println("timeout set 120s");  
 
     if (!wifiManager.startConfigPortal(HOSTNAME)) {
     Serial.println("Not connected, restarting");  
@@ -46,54 +44,8 @@ void wifisetup(){
       digitalWrite(OnBoardLed, LedOff);
      }
   digitalWrite(OnBoardLed, LedOff);
-*/
-}
-//-------------------------------------------------------
-void connectWifi() {
-  byte tryTime = 30; //time s to wait for connect
-  Serial.println("Connecting as wifi client");
-  WiFi.disconnect();
-  WiFi.hostname(HOSTNAME);
-  WiFi.begin ( ssid, pass );
-  //if you need manually given IP address it should be done here
-  
-  // Wait for connection
-  while ((WiFi.status() != WL_CONNECTED) && tryTime > 0 ){
-    delay(1000);
-    tryTime--;
-    if (tryTime%10 == 0) {
-      Serial.println(".");
-     } else {
-      Serial.print(".");
-     }  
-  }
-  Serial.println();
-  int stat = WiFi.status();
-  Serial.print("Connection result: ");
-  shoWiFi(stat);
-  if (stat != 3) {
-    WiFi.disconnect(); //not connected, leads to retry at main loop after retry timeout
-  } else { 
-    Serial.print("IP addres for this client ");
-    Serial.print(HOSTNAME);
-    Serial.print(" is: "); 
-    Serial.println(WiFi.localIP());
-  }
-}
-//-------------------------------------------------------
-void MylocalAp(){
-IPAddress local_IP(192,168,4,2);
-IPAddress gateway(192,168,4,2);
-IPAddress subnet(255,255,255,0);
 
-Serial.print("Setting soft-AP configuration ... ");
-Serial.println(WiFi.softAPConfig(local_IP, gateway, subnet) ? "Ready" : "Failed!");
-Serial.print("Setting soft-AP ... ");
-Serial.println(WiFi.softAP(HOSTNAME, PASSWORD) ? "Ready" : "Failed!");
-Serial.print("Soft-AP IP address = ");
-Serial.println(WiFi.softAPIP());
 }
-
 //-------------------------------------------------------
 void printMac() {
   

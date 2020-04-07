@@ -6,9 +6,9 @@ v1.1  added many conf commands, first release, tests start
 v1.2  modularizing source
 */
 #include <ESP8266WiFi.h>          //https://github.com/esp8266/Arduino
-//#include <ESP8266WebServer.h>
-//#include <DNSServer.h>
-//#include <WiFiManager.h>          //https://github.com/tzapu/WiFiManage
+#include <ESP8266WebServer.h>
+#include <DNSServer.h>
+#include <WiFiManager.h>          //https://github.com/tzapu/WiFiManage
 #define TRIGGER_PIN 0              // access to WiFimanager when onboard led is blinking 
 #define OnBoardLed 2               //ESP's onboard led pin (Check! May vary)
 #define LedOn LOW                 //ESP's onboard led illuminated (Check! May vary, too)
@@ -25,13 +25,13 @@ uint8_t CliNr; //client #nr
 #define CW 4  //clockwise relay
 #define CCW 5 //counterclockwise relay
 #define POT A0 //potentiometer ADC (esp always 0)
-#define EETOP 15 //reserved eeprom bytes 
+#define EETOP 100 //reserved eeprom bytes 
 #define turnwatch 3000 // timeout to check that some movement has happened (ms)
 #define IFtimeout 800 //timeout for TCP response (ms)
 
 #define ResetEsp(pin) {digitalWrite(pin, LOW);delay(5); digitalWrite(pin, HIGH); }
 
-
+char HOSTNAME[7] = "ROTCTL";
 String vers = "v1.2";  //Version    OH1KH-2017
 int MCW,LCW =1023; //clockwise reading,limit max
 int MCCW,LCCW =0; //counterclockwise reading,limit max
@@ -50,18 +50,10 @@ byte mac[6];                      //mac of WiFi
 
 String RigCmd = "";          //received command from telnet
 char prech = '\n';
-String s = "";              // general string;
 
 unsigned long turntime = 0;  //timer for motor running
 boolean ok = false; //general boolean
-
-char HOSTNAME[] = "rotctl-m";
-char PASSWORD[] = "mypass";       //password for softAP
-char ssid[]     = "oh1kh";        //WiFi network to be connected as STATION
-char pass[]     = "Koti%Werkko";  //WiFi network password (WPA) 
-unsigned long ConTimeWait = 0;
-unsigned long CTO = 600000;  // time to wait before new attempt to log in WiFI network
-
+ 
 
 //-------------------------------------------------------
 void ShowIfDebug(String show) {
@@ -72,8 +64,6 @@ void ShowIfDebug(String show) {
 //intro of subroutines
 //---wifi----------------------------------------------------
 void wifisetup();
-void connectWifi(); 
-void MylocalAp();
 void printMac();
 void shoWiFi(int stat);
 void Myinfo();
@@ -112,12 +102,10 @@ void setup() {
   delay(500);
   Serial.begin(115200);
   delay(500);
-  /* 
+ 
   Serial.println("\nGround pin "+String(TRIGGER_PIN)+" to enter WiFi setup");
   pinMode(TRIGGER_PIN, INPUT);
   pinMode(OnBoardLed, OUTPUT);
-
-
   digitalWrite(OnBoardLed, LedOff);
   for (i=0; i<=5000; i++) { 
      if (i%100 == 0 )  digitalWrite(OnBoardLed, LedOn);
@@ -127,10 +115,6 @@ void setup() {
        wifisetup();
      }
   } 
- */
-
-
- 
 
   
   debug = true;
@@ -151,15 +135,12 @@ void setup() {
       MCCW =0; //counterclockwise reading max
       LCW = MCW;
       LCCW = MCCW;
-      ShowIfDebug("EE-error CW & CCW max are now set as 1023 & 0 ");
-      eewrite();
+      ShowIfDebug("EE-error CW & CCW max/limit set as 1023 & 0 ");
   }
   
  chklimits();
-
-  WiFi.mode(WIFI_AP_STA); 
-  MylocalAp();
-  connectWifi();    
+ Myinfo();
+      
   server.begin();
   server.setNoDelay(true);
   delay(5);
@@ -170,13 +151,7 @@ void setup() {
 
 
 void loop() { 
-  //check that we are still connected
-  if (WiFi.status() != WL_CONNECTED){
-    if ((millis()- ConTimeWait) > CTO) {
-      connectWifi(); 
-      ConTimeWait = millis(); 
-    }
-  }
+
   serveTCP();//check connects and disconnects
   readCli(); //read client command and execute it
   turns(); //produce turning and limit checks

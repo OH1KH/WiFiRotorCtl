@@ -1,23 +1,9 @@
 //-------------------------------------------------------
 boolean eecheck() {
   byte check = 0;
-  boolean empty = true;
 // byte 0 xored checksum of whole area
- for (int address = 1;address <= EETOP; ++address){ 
-    check = EEPROM.read(address) ^ check;
-    if (empty) {
-      empty = (EEPROM.read(address) == '\0');
-     }
-    }
-  if (EEPROM.read(0) != check) { 
-    return false;
-    } else { 
-     if (!empty){ 
-      return true;
-      } else { 
-        return false;
-        }
-     }
+ for (int address = 1;address <= EETOP; ++address){ check = EEPROM.read(address) ^ check;};
+  if (EEPROM.read(0) != check) { return false; } else { return true; };
 }
 //-------------------------------------------------------
 void eesum() {
@@ -25,23 +11,23 @@ void eesum() {
   byte check = 0;
   for (int address = 1;address <= EETOP; ++address){ check = EEPROM.read(address) ^ check;};
   EEPROM.write(0,check); 
-   ShowIfDebug("writing eeprom check byte ");  
   EEPROM.commit(); //note here the commit!
 }
 //-------------------------------------------------------
 boolean eestart() {
   boolean ret = true;
-  ShowIfDebug("Reserve EEPROM"); 
+  ShowIfDebug("Reserve EEPROM");
   EEPROM.begin(EETOP); 
   ShowIfDebug("check EEPROM ");
   if (!eecheck()) {
-      ShowIfDebug("Is NOT ok. Writing 0 to EEPROM");
+      ShowIfDebug("Is NOT ok. Writing 0s to EEPROM");
       for (int address = 0;address <= EETOP; ++address){ EEPROM.write(address,0); };
       EEPROM.commit(); //note here the commit!
       ret = false;
      } else {
-     ShowIfDebug(" Reading EEPROM is ok.");
-   } 
+     ShowIfDebug("Reading EEPROM is ok.");
+   }
+ return ret;  
 }
 //-------------------------------------------------------
 int eewriteW(int pos, int t) {  //write word (startpos,word)
@@ -89,7 +75,7 @@ int eeread() { //read CW and CCW analog max values
     } else {
       MCW =1023; //clockwise reading max
       MCCW =0; //counterclockwise reading max
-      ShowIfDebug("EE-error [in read] CW & CCW max are now set as 1023 & 0 "); 
+      ShowIfDebug("EE-error CW & CCW max set as 1023 & 0 "); 
     }
     
     chklimits();
