@@ -1,5 +1,4 @@
 # WiFiRotorCtl
-This folder holds rotor controller that saves values to SPiFFS (to file) and uses WiFi manager to get connected to WiFi network.
+This folder holds rotor controller that has values in file (SPIFFS)
 
-This is not tested at all!
-
+This is not prperly tested!

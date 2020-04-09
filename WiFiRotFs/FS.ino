@@ -1,19 +1,4 @@
-//-----------------------------------------
- void fWwrite(int t) {
 
- byte tl = t % 256;
- byte th = t / 256;
- f.print(tl);
- f.print(th);
-}
-//-----------------------------------------
- int fWread() {
-
- byte tl = f.read();
- byte th = f.read();
- int result  = 256*th+tl;
- return result;
-}
 //----------------------------------------
 void writeparms(){
 
@@ -28,28 +13,28 @@ void writeparms(){
   {
       //Write data to file
       ShowIfDebug("Writing Data to File");
-      fWwrite(MCW);
+      f.println(String(MCW));
       ShowIfDebug("MaxCW "+String(MCW)+ " saved");
-      fWwrite(MCCW);
+      f.println(String(MCCW));
       ShowIfDebug("MaxCCW "+String(MCCW)+ " saved");
-      fWwrite(truefix);
+      f.println(String(truefix));
       ShowIfDebug("Truefix "+String(truefix)+ " saved");
-      fWwrite(LCW);
+      f.println(String(LCW));
       ShowIfDebug("LimitCW "+String(LCW)+ " saved");
-      fWwrite(LCCW);
+      f.println(String(LCCW));
       ShowIfDebug("LimitCCW "+String(LCCW)+ " saved");
-      f.print(negdeg);
+      f.println(String(negdeg));
       ShowIfDebug("NegDeg "+String(negdeg)+ " saved");
       f.close();  //Close file
   }
  
 }
-
 //----------------------------------------
 void readparms(){
- int i;
- byte b;
-  
+String s,r;
+int i,p;  
+int t[6]={0,0,0,0,0,0};
+
   //Read File data
   f = SPIFFS.open(filename, "r");
   
@@ -60,18 +45,33 @@ void readparms(){
   {
       ShowIfDebug("Reading Data from File:");
       //Data from file
-          MCW = fWread();
-          ShowIfDebug("MaxCW "+String(MCW)+ " saved");
-          MCCW = fWread();
-          ShowIfDebug("MaxCCW "+String(MCCW)+ " saved");
-          truefix = fWread();
-          ShowIfDebug("Truefix "+String(truefix)+ " saved");
-          LCW = fWread();
-          ShowIfDebug("LimitCW "+String(LCW)+ " saved");
-          LCCW = fWread();
-          ShowIfDebug("LimitCCW "+String(LCCW)+ " saved");
-          negdeg = f.read();
-          ShowIfDebug("NegDeg "+String(negdeg)+ " saved");
+          s= f.readString();
+          ShowIfDebug(s);
+
+          r=""; p=0;
+          for (i=0;i<s.length();i++) {
+
+           if (s[i] != '\n') {
+                    r= r+s[i];
+           } else {
+            t[p] = r.toInt();
+            p++;
+            r="";
+           }
+          }
+
+          MCW = t[0];
+          ShowIfDebug("MaxCW "+String(MCW)+ " read");
+          MCCW = t[1];
+          ShowIfDebug("MaxCCW "+String(MCCW)+ " read");
+          truefix = t[2];
+          ShowIfDebug("Truefix "+String(truefix)+ " read");
+          LCW = t[3];
+          ShowIfDebug("LimitCW "+String(LCW)+ " read");
+          LCCW = t[4];
+          ShowIfDebug("LimitCCW "+String(LCCW)+ " read");
+          negdeg = t[5];
+          ShowIfDebug("NegDeg "+String(negdeg)+ " read");
       f.close();  //Close file
       ShowIfDebug("File Closed");
   }  

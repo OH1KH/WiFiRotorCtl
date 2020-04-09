@@ -314,12 +314,14 @@ void set_conf(int away){
   if (RigCmd.indexOf("DEBUG",0) == 0){ 
     if (RigCmd.indexOf("1",0) > 5){  // to get debug msgs to serial port
       debug = true;
+      DbgCliNr= CliNr;
       ShowIfDebug("Debug on");
       rep = "RPRT 0\n";
     } 
     if (RigCmd.indexOf("0",0) > 5){
       ShowIfDebug("Debug off");
       debug = false;
+      DbgCliNr= 99;
       rep = "RPRT 0\n";
     }
   } 

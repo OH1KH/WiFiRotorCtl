@@ -20,6 +20,7 @@ v1.2  modularizing source
 WiFiServer server(4533);
 WiFiClient serverClients[MAX_SRV_CLIENTS];
 uint8_t CliNr; //client #nr
+uint8_t DbgCliNr = 99; //client #nr that gets dbg 99=none
 
 #define ResEsp 13 // pin connected to reset via 1k resistor
 #define CW 4  //clockwise relay
@@ -54,12 +55,6 @@ char prech = '\n';
 unsigned long turntime = 0;  //timer for motor running
 boolean ok = false; //general boolean
  
-
-//-------------------------------------------------------
-void ShowIfDebug(String show) {
- if (debug) Serial.println(show);
-}
-
 //------------------------------------------------------
 //intro of subroutines
 //---wifi----------------------------------------------------
@@ -76,6 +71,7 @@ int eewrite();
 int eeread();
 //---help---------------------------------------------------
 void helpCee();
+void ShowIfDebug(String show);
 //---tcp----------------------------------------------------
 void disClient();
 void serveTCP();

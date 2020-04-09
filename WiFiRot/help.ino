@@ -12,3 +12,20 @@ void helpCee(){
  writeCli("\n");
  ok = true;
 }
+//-------------------------------------------------------
+void ShowIfDebug(String show) {
+ if (debug) {
+  Serial.println(show);
+  if (DbgCliNr!= 99){
+    show=show+"\n";
+    size_t len = show.length()+1;
+    char sbuf[len];
+    show.toCharArray(sbuf,len);
+    if (serverClients[DbgCliNr] && serverClients[DbgCliNr].connected()){
+      serverClients[DbgCliNr].write(sbuf, len);
+      delay(5);
+     }
+  }
+    
+ }
+}

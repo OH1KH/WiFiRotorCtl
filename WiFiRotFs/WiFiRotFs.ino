@@ -14,13 +14,13 @@ v1.2  modularizing source
 #define LedOn LOW                 //ESP's onboard led illuminated (Check! May vary, too)
 #define LedOff HIGH               //ESP's onboard led NOT illuminated 
 #include <FS.h>
-//#include <EEPROM.h>
 
 //how many clients should be able to telnet to this 
 #define MAX_SRV_CLIENTS 3
 WiFiServer server(4533);
 WiFiClient serverClients[MAX_SRV_CLIENTS];
 uint8_t CliNr; //client #nr
+uint8_t DbgCliNr = 99; //client #nr that gets dbg 99=none
 
 #define ResEsp 13 // pin connected to reset via 1k resistor
 #define CW 4  //clockwise relay
@@ -58,11 +58,6 @@ boolean ok = false; //general boolean
 const char* filename = "/rot.conf";
 File f; 
 
-//-------------------------------------------------------
-void ShowIfDebug(String show) {
- if (debug) Serial.println(show);
-}
-
 //------------------------------------------------------
 //intro of subroutines
 //---wifi----------------------------------------------------
@@ -71,21 +66,11 @@ void printMac();
 void shoWiFi(int stat);
 void Myinfo();
 //---SPIFFS-----------------------------------------------
-void fWwrite(int t);
- int fWread();
 void writeparms();
 void readparms();
-//------------------------------------------------------
-/*/----eeprom--------------------------------------------------
-boolean eecheck();
-void eesum();
-boolean eestart();
-int eewriteW(int pos, int t);
-int eewrite();
-int eeread();
-*/
 //---help---------------------------------------------------
 void helpCee();
+void ShowIfDebug(String show);
 //---tcp----------------------------------------------------
 void disClient();
 void serveTCP();
@@ -141,7 +126,7 @@ void setup() {
    //Initialize File System
   Serial.println(SPIFFS.begin() ? "SPIFFS Ready" : "SPIFFS Failed!");
 
-  if (!SPIFFS.exists(filename)) {
+ if (!SPIFFS.exists(filename)) {
     Serial.println("Please wait for SPIFFS to be formatted");
     if (SPIFFS.format()) {
       Serial.println("Spiffs formatted");
@@ -152,16 +137,16 @@ void setup() {
       truefix = 0;
       negdeg = 0;
       writeparms();
-    } else {
+     } else {
      Serial.println("File System Formatting Error"); 
     }
-      
+   
      } else {
       Serial.println("SPIFFS is formatted. Moving along...");
-      readparms();
+     readparms();
   }
 
-  
+  readparms();
   
  /* 
   ShowIfDebug("Checking eeprom");
