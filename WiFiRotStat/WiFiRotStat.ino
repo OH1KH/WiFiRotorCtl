@@ -6,9 +6,9 @@ v1.1  added many conf commands, first release, tests start
 v1.2  modularizing source
 */
 #include <ESP8266WiFi.h>          //https://github.com/esp8266/Arduino
-//#include <ESP8266WebServer.h>
-//#include <DNSServer.h>
-//#include <WiFiManager.h>          //https://github.com/tzapu/WiFiManage
+#include <ESP8266mDNS.h>        // Include the mDNS library
+#include <ArduinoOTA.h>
+#include <WiFiUdp.h>
 #define TRIGGER_PIN 0              // access to WiFimanager when onboard led is blinking 
 #define OnBoardLed 2               //ESP's onboard led pin (Check! May vary)
 #define LedOn LOW                 //ESP's onboard led illuminated (Check! May vary, too)
@@ -31,26 +31,25 @@ uint8_t DbgCliNr = 99; //client #nr that gets dbg 99=none
 
 #define ResetEsp(pin) {digitalWrite(pin, LOW);delay(5); digitalWrite(pin, HIGH); }
 
-char HOSTNAME[] = "rotctl-m";
-
 #ifndef APSSID
 #define APSSID "rotctl-m";
 #define APPSK  "myrotpass" //at least 8chrs
 #endif
 /* Set these to your desired credentials. */
+const char *HOSTNAME = APSSID;
 const char *assid = APSSID;
 const char *apass = APPSK;
 
 #ifndef WSSID
 #define WSSID "oh1kh";
-#define WPSK  "mywifipass" 
+#define WPSK  "----" 
 #endif
 /* Set these to your WiFi credentials. */
 const char *ssid = WSSID;
 const char *pass = WPSK;
  
 unsigned long ConTimeWait = 0;
-unsigned long CTO = 600000;  // time to wait before new attempt to log in WiFI network
+unsigned long CTO = 120000;  // time to wait before new attempt to log in WiFI network
 
 String vers = "v1.2";  //Version    OH1KH-2017
 int MCW,LCW =1023; //clockwise reading,limit max
@@ -84,6 +83,7 @@ void MylocalAp();
 void printMac();
 void shoWiFi(int stat);
 void Myinfo();
+void setupOta();
 //---help---------------------------------------------------
 void helpCee();
 void ShowIfDebug(String show);
@@ -92,6 +92,7 @@ void disClient();
 void serveTCP();
 void readCli();
 void writeCli(String answer);
+bool HasCli();
 //---cmds----------------------------------------------------
 void chklimits();
 void turns();
@@ -133,26 +134,46 @@ void setup() {
  
  chklimits();
 
-  WiFi.mode(WIFI_AP_STA); 
-  MylocalAp();
-  connectWifi();    
+  connectWifi(); 
+  setupOta();
   server.begin();
   server.setNoDelay(true);
   delay(5);
 
- ShowIfDebug("Starting rot version:"+vers);
- debug = false;
+ ShowIfDebug("Starting rot version:"+vers+" as "+HOSTNAME);
+ debug = true;
 }
 
 
 void loop() { 
-  //check that we are still connected
-  if (WiFi.status() != WL_CONNECTED){
-    if ((millis()- ConTimeWait) > CTO) {
-      connectWifi(); 
-      ConTimeWait = millis(); 
+  ArduinoOTA.handle();
+  //time check that we are still connected
+  if ((millis()- ConTimeWait) > CTO) {
+    ShowIfDebug("Check WiFi Connection");
+    if (WiFi.getMode() != WIFI_STA) {
+     ShowIfDebug("We are AP"); 
+     if (!HasCli()) {
+          ShowIfDebug("No AP clients, try WiFi");
+          connectWifi();
+          ConTimeWait = millis();
+     } else {
+      ShowIfDebug("We have client connected");
+      ConTimeWait = millis();
+     }
+    } 
+    else { // if WIFI_AP then if no clients try to connect WiFi network
+      ShowIfDebug("We are STA");
+      if (WiFi.status() != WL_CONNECTED){
+         ShowIfDebug("We are not connected!"); 
+         connectWifi(); 
+         ConTimeWait = millis(); 
+      } else {
+        ShowIfDebug("We are connected!"); 
+        ConTimeWait = millis();  
+      }
     }
-  }
+   }
+ 
   serveTCP();//check connects and disconnects
   readCli(); //read client command and execute it
   turns(); //produce turning and limit checks

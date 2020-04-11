@@ -73,3 +73,12 @@ void writeCli(String answer) {
    }
 }
 //-------------------------------------------------------
+bool HasCli() {
+  bool has=false;
+  for(CliNr = 0; CliNr < MAX_SRV_CLIENTS; CliNr++){
+    if ((!has) && (serverClients[CliNr].connected())){
+      has=true;
+    }
+  }
+ return has;
+}
