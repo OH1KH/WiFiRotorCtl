@@ -101,6 +101,7 @@ if ( debug ) {
 } 
 //-------------------------------------------------------
 void setupOta(){
+  Serial.println("Setup OTA");
   // Port defaults to 8266
   // ArduinoOTA.setPort(8266);
 

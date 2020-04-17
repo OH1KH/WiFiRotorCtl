@@ -20,6 +20,7 @@ WiFiServer server(4533);
 WiFiClient serverClients[MAX_SRV_CLIENTS];
 uint8_t CliNr; //client #nr
 uint8_t DbgCliNr = 99; //client #nr that gets dbg 99=none
+unsigned long CliTO[MAX_SRV_CLIENTS];
 
 #define ResEsp 13 // pin connected to reset via 1k resistor
 #define CW 4  //clockwise relay
@@ -32,7 +33,7 @@ uint8_t DbgCliNr = 99; //client #nr that gets dbg 99=none
 #define ResetEsp(pin) {digitalWrite(pin, LOW);delay(5); digitalWrite(pin, HIGH); }
 
 #ifndef APSSID
-#define APSSID "rotctl-m";
+#define APSSID "rotor";
 #define APPSK  "myrotpass" //at least 8chrs
 #endif
 /* Set these to your desired credentials. */
@@ -42,7 +43,7 @@ const char *apass = APPSK;
 
 #ifndef WSSID
 #define WSSID "oh1kh";
-#define WPSK  "----" 
+#define WPSK  "-----" 
 #endif
 /* Set these to your WiFi credentials. */
 const char *ssid = WSSID;
@@ -50,8 +51,10 @@ const char *pass = WPSK;
  
 unsigned long ConTimeWait = 0;
 unsigned long CTO = 120000;  // time to wait before new attempt to log in WiFI network
+unsigned long DataTimeWait[MAX_SRV_CLIENTS];
+unsigned long DTO = 120000; // time to disconnect client if no traffic
 
-String vers = "v1.2";  //Version    OH1KH-2017
+String vers = "v1.2";  //Version    OH1KH-2020
 int MCW,LCW =1023; //clockwise reading,limit max
 int MCCW,LCCW =0; //counterclockwise reading,limit max
 float heading,fixheading = 0; //where rotator,antenna points
@@ -126,9 +129,9 @@ void setup() {
   digitalWrite(CW,LOW);
   digitalWrite(CCW,LOW);
   
-      MCW =1023; //clockwise reading max
+      MCW =919; //clockwise reading max
       MCCW =0; //counterclockwise reading max
-      LCW = MCW;
+      LCW = 282;
       LCCW = MCCW;
       ShowIfDebug("CW & CCW max are now set as defaults");
  
