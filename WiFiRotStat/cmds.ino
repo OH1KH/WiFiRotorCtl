@@ -264,6 +264,11 @@ void set_conf(int away){
        ShowIfDebug("LCW = MCW");
        LCW =MCW;
      } else {
+       if (RigCmd.length() > 4) { //there may be parameter
+        longTOshort(3);
+        if (RigCmd.toInt() > 0) Mdir = int(RigCmd.toInt()); //you can't set value 0!
+        RigCmd = "LCW "+RigCmd; //for long reporting
+        }
        LCW = Mdir;
        ShowIfDebug("LCW = "+String(LCW));
      }
@@ -275,6 +280,11 @@ void set_conf(int away){
        ShowIfDebug("LCCW = MCCW");
        LCCW =MCCW;
      } else {
+       if (RigCmd.length() > 5) { //there may be parameter
+        longTOshort(4);
+        if (RigCmd.toInt() > 0) Mdir = int(RigCmd.toInt()); //you can't set value 0!
+        RigCmd = "LCCW "+RigCmd; //for long reporting 
+        }
        LCCW = Mdir;
        ShowIfDebug("LCCW = "+String(LCCW));
      }
@@ -307,7 +317,7 @@ void set_conf(int away){
   if (RigCmd.indexOf("DEBUG",0) == 0){ 
     if (RigCmd.indexOf("1",0) > 5){  // to get debug msgs to serial port
       debug = true;
-      DbgCliNr= CliNr;
+      DbgCliNr = CliNr;
       ShowIfDebug("Debug on");
       rep = "RPRT 0\n";
     } 
@@ -462,7 +472,7 @@ void ParseCommand(){
     break;  //longmode command
   
   
-  case '?': dump_state();
+  case '?': help(); // dump_state();
    break; 
   
   case 'p': get_pos();

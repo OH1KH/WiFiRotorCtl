@@ -33,7 +33,7 @@ unsigned long CliTO[MAX_SRV_CLIENTS];
 #define ResetEsp(pin) {digitalWrite(pin, LOW);delay(5); digitalWrite(pin, HIGH); }
 
 #ifndef APSSID
-#define APSSID "rotor";
+#define APSSID "rotorB";
 #define APPSK  "myrotpass" //at least 8chrs
 #endif
 /* Set these to your desired credentials. */
@@ -88,6 +88,7 @@ void shoWiFi(int stat);
 void Myinfo();
 void setupOta();
 //---help---------------------------------------------------
+void help();
 void helpCee();
 void ShowIfDebug(String show);
 //---tcp----------------------------------------------------
@@ -129,9 +130,9 @@ void setup() {
   digitalWrite(CW,LOW);
   digitalWrite(CCW,LOW);
   
-      MCW =919; //clockwise reading max
-      MCCW =0; //counterclockwise reading max
-      LCW = 282;
+      MCW =1023; //clockwise reading max
+      MCCW = 0; //counterclockwise reading max
+      LCW = 1023;
       LCCW = MCCW;
       ShowIfDebug("CW & CCW max are now set as defaults");
  

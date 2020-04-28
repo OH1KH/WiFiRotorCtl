@@ -1,7 +1,12 @@
 void disClient(){
   if (serverClients[CliNr] && serverClients[CliNr].connected()){
     serverClients[CliNr].stop();
-    Serial.println("Client "+String(CliNr)+" forced disconnected");
+    if (DbgCliNr == CliNr) {
+      DbgCliNr = 99;
+      debug=false;
+      trace=false;
+     }
+    ShowIfDebug("Client "+String(CliNr)+" forced disconnected");
   }
 }
 //-------------------------------------------------------
@@ -14,7 +19,7 @@ void serveTCP() {
       if (!serverClients[CliNr] || !serverClients[CliNr].connected()){
         if(serverClients[CliNr]) serverClients[CliNr].stop();
         serverClients[CliNr] = server.available();
-        if (debug) { Serial.print("New client: #"); Serial.println(CliNr); }
+        ShowIfDebug("Free client: #"+ String(CliNr));
         //reset dataRX timer
         CliTO[CliNr] = millis();
         continue;
@@ -78,7 +83,7 @@ void writeCli(String answer) {
   if (serverClients[CliNr] && serverClients[CliNr].connected()){
     serverClients[CliNr].write(sbuf, len);
     delay(5);
-    Serial.println(answer);
+    ShowIfDebug(answer);
    }
 }
 //-------------------------------------------------------
